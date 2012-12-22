@@ -5,7 +5,7 @@ Server server;
 String basePath;
 FileFolder root;
 void setup() {
-  size(500,500);
+  //size(500,500);
   String[] config = loadStrings("data/config");
   basePath = config[0];
   java.io.File f = new java.io.File(basePath);
@@ -14,7 +14,7 @@ void setup() {
 }
 
 void draw() {
-  //this.frame.setVisible(true);
+  this.frame.setVisible(false);
 }
 
 class FileFolder {
