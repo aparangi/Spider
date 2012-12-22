@@ -13,7 +13,7 @@ void setup() {
 }
 
 void draw() {
-  this.frame.setVisible(false);
+  //this.frame.setVisible(false);
 }
 
 class FileFolder {
