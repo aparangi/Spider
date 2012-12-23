@@ -8,7 +8,6 @@ void setup() {
   //size(500,500);
   String[] config = loadStrings("data/config");
   basePath = config[0];
-  java.io.File f = new java.io.File(basePath);
   root = new FileFolder(basePath);
   root.printFolder();
 }
