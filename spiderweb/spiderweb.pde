@@ -1,19 +1,87 @@
 import processing.net.*;
 import javax.swing.*;
-Client client;
+import java.net.URLConnection;
+import java.net.InetAddress;
 Server server;
 String basePath;
 FileFolder root;
+ArrayList<Peer> peers;
+int PORT = 5204;
+int SERVER_POLLING_PERIOD = 2000;
+int counter = 0;
 void setup() {
-  //size(500,500);
+  size(1,1);
   String[] config = loadStrings("data/config");
   basePath = config[0];
   root = new FileFolder(basePath);
-  root.printFolder();
+  server = new Server(this, PORT);
+  //root.printFolder();
+  println(getPeers(config[1],config[2],config[3], getIP()));
+  this.frame.setVisible(false);
+  frameRate(1);
 }
 
 void draw() {
-  //this.frame.setVisible(false);
+  this.frame.setVisible(false);
+
+
+
+  counter++;
+}
+
+String[] getPeers(String server, String user, String password, String ip) {
+  return loadStrings(server+"/s.php?u="+user+"&pw="+password+"&ip="+ip);
+}
+
+String getIP() {
+  try {
+    InetAddress inet = InetAddress.getLocalHost();
+    return inet.getHostAddress();
+  } 
+  catch (Exception e) {
+    e.printStackTrace();
+    return null;
+  }
+}
+
+String codify(String user, String password) {
+  int p1 = 0;
+  int p2 = 0;
+  String buffer = "";
+  for (int i = 0; i < user.length() + password.length(); i++) {
+    if (p1 < user.length()) {
+      buffer += user.substring(p1,p1+1);
+      p1++;
+    }
+    if (p2 < password.length()) {
+      buffer += password.substring(p2,p2+1);
+      p2++;
+    }
+  }
+  return md5(buffer);
+}
+
+String md5(String message) {
+  try {
+    java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+    md.update(message.getBytes());
+    byte[] dig = md.digest();
+    String buffer = "";
+    for(int i=0; i<dig.length; i++) {
+      buffer += hex(dig[i],2);
+    }
+    return buffer;
+  } 
+  catch(java.security.NoSuchAlgorithmException e) {
+    println(e.getMessage());
+    return null;
+  }
+} 
+
+class Peer {
+  String publicIP;
+  String privateIP;
+  Client client;
 }
 
 class FileFolder {
