@@ -51,7 +51,7 @@ public class SClient implements Runnable {
   int port;
   String host;
   boolean connectionStatus;
-  
+
   public InputStream input;
   public OutputStream output;
 
@@ -70,7 +70,6 @@ public class SClient implements Runnable {
     this.host = host;
     this.port = port;
     connectionStatus = true;
-    println("trying to connect to " + host);
     try {
       socket = new Socket(this.host, this.port);
       input = socket.getInputStream();
@@ -110,7 +109,6 @@ public class SClient implements Runnable {
     } 
     catch (ConnectException ce) {
       //ce.printStackTrace();
-        this.connectionStatus = false;
       dispose();
     } 
     catch (IOException e) {
@@ -171,6 +169,7 @@ public class SClient implements Runnable {
    * use stop() instead from within your own applets.
    */
   public void dispose() {
+    this.connectionStatus = false;
     thread = null;
     try {
       // do io streams need to be closed first?
@@ -512,7 +511,7 @@ public class SClient implements Runnable {
       //e.printStackTrace();
       //dispose();
       //disconnect(e);
-      e.printStackTrace();
+      //e.printStackTrace();
       stop();
     }
   }
@@ -527,7 +526,7 @@ public class SClient implements Runnable {
       //errorMessage("write", e);
       //e.printStackTrace();
       //disconnect(e);
-      e.printStackTrace();
+      //e.printStackTrace();
       stop();
     }
   }

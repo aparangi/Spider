@@ -58,7 +58,12 @@ void draw() {
 }
 
 String[] getPeers(String server, String user, String password, String ip) {
-  return loadStrings(server+"/s.php?u="+user+"&pw="+password+"&ip="+ip);
+  String[] serverResponse = loadStrings(server+"/s.php?u="+user+"&pw="+password+"&ip="+ip);
+  if (serverResponse != null) {
+    return serverResponse;
+  } else {
+    return null;
+  }
 }
 
 String getIP() {
