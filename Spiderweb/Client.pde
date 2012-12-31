@@ -69,7 +69,7 @@ public class SClient implements Runnable {
     this.parent = parent;
     this.host = host;
     this.port = port;
-    connectionStatus = false;
+    connectionStatus = true;
     println("trying to connect to " + host);
     try {
       socket = new Socket(this.host, this.port);
@@ -103,7 +103,6 @@ public class SClient implements Runnable {
           SClient.class
         }
         );
-        this.connectionStatus = true;
       } 
       catch (Exception e) {
         // no such method, or an error.. which is fine, just ignore
@@ -111,6 +110,7 @@ public class SClient implements Runnable {
     } 
     catch (ConnectException ce) {
       //ce.printStackTrace();
+        this.connectionStatus = false;
       dispose();
     } 
     catch (IOException e) {
