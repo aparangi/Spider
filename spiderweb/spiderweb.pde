@@ -8,15 +8,17 @@ FileFolder root;
 ArrayList<Peer> peers;
 String[] serverReport;
 String[] config;
-Spiderweb applet = this;
+spiderweb applet = this;
 int PORT = 5204;
 int SERVER_POLLING_PERIOD = 200;
 int REFRESH_POLLING_PERIOD = 5;
 int CHUNK_SIZE = 1000000; //bytes
 int counter = 0;
+String PUBLIC_IP = "";
 void setup() {
   size(1,1);
   config = loadStrings("data/config");
+  refreshIP();
   basePath = config[0];
   root = new FileFolder(basePath);
   server = new Server(this, PORT);
@@ -104,13 +106,23 @@ String md5(String message) {
   }
 } 
 
+void refreshIP() {
+  String[] ip = loadStrings(config[1] + "/ip.php");
+  if (ip != null) {
+    PUBLIC_IP = ip[0];
+  } 
+  else {
+    PUBLIC_IP = "0";
+  }
+}
+
 class Peer {
   String publicIP;
   String privateIP;
   String conIP;
   SClient client;
   Peer(String publicIP, String privateIP) {
-    if (getIP().equals(publicIP)) {
+    if (PUBLIC_IP.equals(publicIP)) {
       conIP = privateIP;
     } 
     else {
