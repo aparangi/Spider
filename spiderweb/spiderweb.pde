@@ -10,7 +10,8 @@ String[] serverReport;
 String[] config;
 Spiderweb applet = this;
 int PORT = 5204;
-int SERVER_POLLING_PERIOD = 2000;
+int SERVER_POLLING_PERIOD = 200;
+int REFRESH_POLLING_PERIOD = 5;
 int CHUNK_SIZE = 1000000; //bytes
 int counter = 0;
 void setup() {
@@ -40,6 +41,9 @@ void draw() {
     Peer p = peers.get(i);
     if (p.client.connectionStatus) {
       p.client.write("Hello from " + getIP());
+    } 
+    else if (counter%REFRESH_POLLING_PERIOD == 0) {
+      p.refresh();
     }
   }
   //get all messages

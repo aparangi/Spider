@@ -70,6 +70,7 @@ public class SClient implements Runnable {
     this.host = host;
     this.port = port;
     connectionStatus = false;
+    println("trying to connect to " + host);
     try {
       socket = new Socket(this.host, this.port);
       input = socket.getInputStream();
