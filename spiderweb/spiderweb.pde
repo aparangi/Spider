@@ -65,11 +65,12 @@ void draw() {
   while (nextClient != null) {
     //println(toHex(nextClient.readBytes())); 
     //println(nextClient.readString());
-    
+
     FileFolder manifest = (FileFolder)(deserialize(nextClient.readBytes()));
-    manifest.applet = applet;
-    //println(manifest.name);
-    manifest.printFolder();
+    if (manifest != null) {
+      manifest.applet = applet;
+      manifest.printFolder();
+    }
     nextClient = server.available();
   }
   counter++;
@@ -216,7 +217,6 @@ class Peer {
     return client.connectionStatus;
   }
 }
-
 
 
 
