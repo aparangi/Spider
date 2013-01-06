@@ -53,8 +53,8 @@ void draw() {
   for (int i = 0; i < peers.size(); i++) {
     Peer p = peers.get(i);
     if (p.client.connectionStatus) {
-      p.client.write("Hello from " + getIP());
-      //p.client.write(rootBytes);
+      //p.client.write("Hello from " + getIP());
+      p.client.write(rootBytes);
     } 
     else if (counter%REFRESH_POLLING_PERIOD == 0) {
       p.refresh();
@@ -64,12 +64,12 @@ void draw() {
   Client nextClient = server.available();
   while (nextClient != null) {
     //println(toHex(nextClient.readBytes())); 
-    println(nextClient.readString());
-    /*
+    //println(nextClient.readString());
+    
     FileFolder manifest = (FileFolder)(deserialize(nextClient.readBytes()));
     manifest.applet = applet;
-    println(manifest.name);
-    */
+    //println(manifest.name);
+    manifest.printFolder();
     nextClient = server.available();
   }
   counter++;
