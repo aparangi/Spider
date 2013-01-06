@@ -1,5 +1,6 @@
 import processing.net.*;
 import javax.swing.*;
+import java.math.*;
 import java.net.URLConnection;
 import java.net.InetAddress;
 Server server;
@@ -24,6 +25,7 @@ void setup() {
   server = new Server(this, PORT);
   peers = new ArrayList();
   this.frame.setVisible(false);
+  println(root.flattenToString());
   frameRate(1);
 }
 
@@ -38,7 +40,7 @@ void draw() {
       peers.add(p);
     }
   }
-  //say hi
+  //send messages
   for (int i = 0; i < peers.size(); i++) {
     Peer p = peers.get(i);
     if (p.client.connectionStatus) {
@@ -51,18 +53,19 @@ void draw() {
   //get all messages
   Client nextClient = server.available();
   while(nextClient != null) {
-    println(nextClient.readString()); 
+    //println(nextClient.readString()); 
     nextClient = server.available();
   }
   counter++;
 }
 
 String[] getPeers(String server, String user, String password, String ip) {
-  String[] serverResponse = loadStrings(server+"/s.php?u="+user+"&pw="+password+"&ip="+ip);
+  String[] serverResponse = loadStrings(server+"s.php?u="+user+"&pw="+password+"&ip="+ip);
   if (serverResponse != null) {
     return serverResponse;
-  } else {
-    return null;
+  } 
+  else {
+    return new String[0];
   }
 }
 
@@ -112,13 +115,18 @@ String md5(String message) {
 } 
 
 void refreshIP() {
-  String[] ip = loadStrings(config[1] + "/ip.php");
+  String[] ip = loadStrings(config[1] + "ip.php");
   if (ip != null) {
     PUBLIC_IP = ip[0];
   } 
   else {
     PUBLIC_IP = "0";
   }
+}
+
+public static String toHex(byte[] bytes) {
+  BigInteger bi = new BigInteger(1, bytes);
+  return String.format("%0" + (bytes.length << 1) + "X", bi);
 }
 
 class Peer {
@@ -180,6 +188,22 @@ class FileFolder {
       children.get(i).printFolder(indent + "   ");
     }
   }
+  
+  
+  String flattenToString() {
+    String buffer = name + " <";
+    for (int i = 0; i < contents.size(); i++) {
+      buffer += contents.get(i).name;
+      if (i < contents.size() - 1) {
+        buffer += ",";
+      }
+    }
+    for (int i = 0; i < children.size(); i++) {
+      buffer += children.get(i).flattenToString();
+    }
+    return buffer;
+  }
+  
 }
 
 class SpiderFile {
