@@ -41,6 +41,7 @@ void draw() {
   if (counter%SERVER_POLLING_PERIOD == 0) {
     serverReport = getPeers(config[1], config[2], config[3], getIP());
     peers.clear();
+    println("peer count: " + serverReport.length);
     for (int i = 0; i < serverReport.length; i++) {
       String[] peerRecord = serverReport[i].split(";");
       Peer p = new Peer(peerRecord[0], peerRecord[1]);
