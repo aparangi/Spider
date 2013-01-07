@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.math.*;
 import java.net.URLConnection;
 import java.net.InetAddress;
+import java.lang.Object;
 Server server;
 String basePath;
 FileFolder root;
@@ -17,7 +18,7 @@ int CHUNK_SIZE = 1000000; //bytes
 int counter = 0;
 String PUBLIC_IP = "";
 void setup() {
-  size(1,1);
+  size(1, 1);
   config = loadStrings("data/config");
   refreshIP();
   basePath = config[0];
@@ -25,14 +26,16 @@ void setup() {
   server = new Server(this, PORT);
   peers = new ArrayList();
   this.frame.setVisible(false);
-  println(root.flattenToString());
+  byte[] data = serialize(root);
+  println(toHex(data));
+  //println(root.flattenToString());
   frameRate(1);
 }
 
 void draw() {
   this.frame.setVisible(false);
   if (counter%SERVER_POLLING_PERIOD == 0) {
-    serverReport = getPeers(config[1],config[2],config[3], getIP());
+    serverReport = getPeers(config[1], config[2], config[3], getIP());
     peers.clear();
     for (int i = 0; i < serverReport.length; i++) {
       String[] peerRecord = serverReport[i].split(";");
@@ -44,7 +47,7 @@ void draw() {
   for (int i = 0; i < peers.size(); i++) {
     Peer p = peers.get(i);
     if (p.client.connectionStatus) {
-      p.client.write("Hello from " + getIP());
+      //p.client.write("Hello from " + getIP());
     } 
     else if (counter%REFRESH_POLLING_PERIOD == 0) {
       p.refresh();
@@ -52,7 +55,7 @@ void draw() {
   }
   //get all messages
   Client nextClient = server.available();
-  while(nextClient != null) {
+  while (nextClient != null) {
     //println(nextClient.readString()); 
     nextClient = server.available();
   }
@@ -86,11 +89,11 @@ String codify(String user, String password) {
   String buffer = "";
   for (int i = 0; i < user.length() + password.length(); i++) {
     if (p1 < user.length()) {
-      buffer += user.substring(p1,p1+1);
+      buffer += user.substring(p1, p1+1);
       p1++;
     }
     if (p2 < password.length()) {
-      buffer += password.substring(p2,p2+1);
+      buffer += password.substring(p2, p2+1);
       p2++;
     }
   }
@@ -103,8 +106,8 @@ String md5(String message) {
     md.update(message.getBytes());
     byte[] dig = md.digest();
     String buffer = "";
-    for(int i=0; i<dig.length; i++) {
-      buffer += hex(dig[i],2);
+    for (int i=0; i<dig.length; i++) {
+      buffer += hex(dig[i], 2);
     }
     return buffer;
   } 
@@ -127,6 +130,35 @@ void refreshIP() {
 public static String toHex(byte[] bytes) {
   BigInteger bi = new BigInteger(1, bytes);
   return String.format("%0" + (bytes.length << 1) + "X", bi);
+}
+public static byte[] serialize(Object obj) {
+  ByteArrayOutputStream out = null;
+  ObjectOutputStream os = null;
+  try {
+    out = new ByteArrayOutputStream();
+    os = new ObjectOutputStream(out);
+    os.writeObject(obj);
+  } 
+  catch (Exception e) {
+  }
+  return out.toByteArray();
+}
+public static Object deserialize(byte[] data) {
+  ByteArrayInputStream in = null;
+  ObjectInputStream is = null;
+  Object result = null;
+  try {
+    in = new ByteArrayInputStream(data);
+    is = new ObjectInputStream(in);
+  } 
+  catch (Exception e) {
+  }
+  try {
+    result = is.readObject();
+  } 
+  catch (Exception e) {
+  }
+  return result;
 }
 
 class Peer {
@@ -188,26 +220,10 @@ class FileFolder {
       children.get(i).printFolder(indent + "   ");
     }
   }
-  
-  
-  String flattenToString() {
-    String buffer = name + " <";
-    for (int i = 0; i < contents.size(); i++) {
-      buffer += contents.get(i).name;
-      if (i < contents.size() - 1) {
-        buffer += ",";
-      }
-    }
-    for (int i = 0; i < children.size(); i++) {
-      buffer += children.get(i).flattenToString();
-    }
-    return buffer;
-  }
-  
 }
 
 class SpiderFile {
-  java.io.File f;
+  transient java.io.File f;
   int fileSize;
   String name;
   FileFolder parent;
