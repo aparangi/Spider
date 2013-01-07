@@ -60,7 +60,7 @@ void draw() {
   //get all messages
   Client nextClient = server.available();
   while (nextClient != null) {
-    //println(nextClient.readString()); 
+    println(toHex(nextClient.readBytes())); 
     nextClient = server.available();
   }
   counter++;
