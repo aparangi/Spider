@@ -73,7 +73,7 @@ public class SClient implements Runnable {
     try {
       //socket = new Socket(this.host, this.port);
       socket = new Socket();
-      socket.connect(new InetSocketAddress(host, port), 3000);
+      socket.connect(new InetSocketAddress(host, port), 100);
       input = socket.getInputStream();
       output = socket.getOutputStream();
 

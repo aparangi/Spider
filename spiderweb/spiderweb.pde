@@ -24,6 +24,7 @@ void setup() {
   refreshIP();
   basePath = config[0];
   root = new FileFolder(basePath);
+  root.applet = applet;
   rootBytes = serialize(root);
   server = new Server(this, PORT);
   peers = new ArrayList();
@@ -34,15 +35,16 @@ void setup() {
 void draw() {
   this.frame.setVisible(false);
   //refresh file folder
-  
+
   //DO SOME SHIT HERE
-  
+
   if (counter%SERVER_POLLING_PERIOD == 0) {
     serverReport = getPeers(config[1], config[2], config[3], getIP());
     peers.clear();
     for (int i = 0; i < serverReport.length; i++) {
       String[] peerRecord = serverReport[i].split(";");
       Peer p = new Peer(peerRecord[0], peerRecord[1]);
+      println("adding " + peerRecord[0] + ", " + peerRecord[1]);
       peers.add(p);
     }
   }
@@ -60,7 +62,10 @@ void draw() {
   //get all messages
   Client nextClient = server.available();
   while (nextClient != null) {
-    println(toHex(nextClient.readBytes())); 
+    //println(toHex(nextClient.readBytes())); 
+    FileFolder manifest = (FileFolder)(deserialize(nextClient.readBytes()));
+    manifest.applet = applet;
+    println(manifest.name);
     nextClient = server.available();
   }
   counter++;
@@ -175,11 +180,13 @@ public static Object deserialize(byte[] data) {
     is = new ObjectInputStream(in);
   } 
   catch (Exception e) {
+    println("YOLO");
   }
   try {
     result = is.readObject();
   } 
   catch (Exception e) {
+    println(e);
   }
   return result;
 }
@@ -206,54 +213,7 @@ class Peer {
   }
 }
 
-class FileFolder {
-  ArrayList<SpiderFile> contents;
-  ArrayList<FileFolder> children;
-  String name;
-  String path;
-  FileFolder(String path) {
-    path = trim(path);
-    this.path = path;
-    String[] pathParts = split(path, '/');
-    name = pathParts[pathParts.length - 1];
-    //path = trim(path).substring(0,);
-    contents = new ArrayList();
-    children = new ArrayList();
-    java.io.File f = new java.io.File(path);
-    String[] l = f.list();
-    for (int i = 0; i < l.length; i++) {
-      f  = new java.io.File(path + "/" + l[i]);
-      if (f.list() != null) {
-        children.add(new FileFolder(path + "/" + l[i]));
-      } 
-      else {
-        contents.add(new SpiderFile(l[i], this));
-      }
-    }
-  }
-  void printFolder() {
-    printFolder("");
-  }
-  void printFolder(String indent) {
-    println(indent + "(" + name + ")");
-    for (int i = 0; i < contents.size(); i++) {
-      println(indent + contents.get(i).name);
-    }
-    for (int i = 0; i < children.size(); i++) {
-      children.get(i).printFolder(indent + "   ");
-    }
-  }
-}
 
-class SpiderFile {
-  transient java.io.File f;
-  int fileSize;
-  String name;
-  FileFolder parent;
-  SpiderFile(String name, FileFolder parent) {
-    this.name = name;
-    this.parent = parent;
-    f = new java.io.File(parent.path + "/" + name);
-  }
-}
+
+
 
