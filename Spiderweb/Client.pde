@@ -71,7 +71,9 @@ public class SClient implements Runnable {
     this.port = port;
     connectionStatus = true;
     try {
-      socket = new Socket(this.host, this.port);
+      //socket = new Socket(this.host, this.port);
+      socket = new Socket();
+      socket.connect(new InetSocketAddress(host, port), 3000);
       input = socket.getInputStream();
       output = socket.getOutputStream();
 
@@ -85,7 +87,7 @@ public class SClient implements Runnable {
       // which would be called each time an event comes in
       try {
         clientEventMethod =
-          parent.getClass().getMethod("clientEvent",
+          parent.getClass().getMethod("clientEvent", 
         new Class[] { 
           SClient.class
         }
@@ -97,7 +99,7 @@ public class SClient implements Runnable {
       // do the same for disconnectEvent(SClient c);
       try {
         disconnectEventMethod =
-          parent.getClass().getMethod("disconnectEvent",
+          parent.getClass().getMethod("disconnectEvent", 
         new Class[] { 
           SClient.class
         }
@@ -108,11 +110,9 @@ public class SClient implements Runnable {
       }
     } 
     catch (ConnectException ce) {
-      //ce.printStackTrace();
       dispose();
     } 
     catch (IOException e) {
-      e.printStackTrace();
       dispose();
     }
   }
@@ -193,9 +193,9 @@ public class SClient implements Runnable {
 
 
   public void run() {
-    while (Thread.currentThread() == thread) {
+    while (Thread.currentThread () == thread) {
       try {
-        while ((input != null) &&
+        while ( (input != null) &&
           (input.available() > 0)) {  // this will block
           synchronized (buffer) {
             if (bufferLast == buffer.length) {

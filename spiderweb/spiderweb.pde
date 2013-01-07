@@ -7,13 +7,14 @@ import java.lang.Object;
 Server server;
 String basePath;
 FileFolder root;
+byte[] rootBytes;
 ArrayList<Peer> peers;
 String[] serverReport;
 String[] config;
 spiderweb applet = this;
 int PORT = 5204;
 int SERVER_POLLING_PERIOD = 200;
-int REFRESH_POLLING_PERIOD = 5;
+int REFRESH_POLLING_PERIOD = 9;
 int CHUNK_SIZE = 1000000; //bytes
 int counter = 0;
 String PUBLIC_IP = "";
@@ -23,17 +24,19 @@ void setup() {
   refreshIP();
   basePath = config[0];
   root = new FileFolder(basePath);
+  rootBytes = serialize(root);
   server = new Server(this, PORT);
   peers = new ArrayList();
   this.frame.setVisible(false);
-  byte[] data = serialize(root);
-  println(toHex(data));
-  //println(root.flattenToString());
   frameRate(1);
 }
 
 void draw() {
   this.frame.setVisible(false);
+  //refresh file folder
+  
+  //DO SOME SHIT HERE
+  
   if (counter%SERVER_POLLING_PERIOD == 0) {
     serverReport = getPeers(config[1], config[2], config[3], getIP());
     peers.clear();
@@ -48,6 +51,7 @@ void draw() {
     Peer p = peers.get(i);
     if (p.client.connectionStatus) {
       //p.client.write("Hello from " + getIP());
+      p.client.write(rootBytes);
     } 
     else if (counter%REFRESH_POLLING_PERIOD == 0) {
       p.refresh();
@@ -126,11 +130,30 @@ void refreshIP() {
     PUBLIC_IP = "0";
   }
 }
+/*
+public static String toHex(byte[] bytes) {
+ BigInteger bi = new BigInteger(1, bytes);
+ return String.format("%0" + (bytes.length << 1) + "X", bi);
+ }*/
 
 public static String toHex(byte[] bytes) {
-  BigInteger bi = new BigInteger(1, bytes);
-  return String.format("%0" + (bytes.length << 1) + "X", bi);
+  String buffer = "";
+  for (int i = 0; i < bytes.length; i++) {
+    buffer += trim(String.format("%02X ", bytes[i]));
+  }
+  return buffer;
 }
+
+public static byte[] toBytes(String s) {
+  byte[] result = new byte[s.length()/2];
+  for (int i = 0; i < s.length()/2; i++) {
+    byte b = Byte.parseByte(s.substring(i*2, i*2+2), 16);
+    result[i] = b;
+  }
+  return result;
+}
+
+
 public static byte[] serialize(Object obj) {
   ByteArrayOutputStream out = null;
   ObjectOutputStream os = null;
