@@ -140,11 +140,7 @@ void refreshIP() {
     PUBLIC_IP = "0";
   }
 }
-/*
-public static String toHex(byte[] bytes) {
- BigInteger bi = new BigInteger(1, bytes);
- return String.format("%0" + (bytes.length << 1) + "X", bi);
- }*/
+
 
 public static String toHex(byte[] bytes) {
   String buffer = "";
