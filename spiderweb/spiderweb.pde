@@ -14,6 +14,7 @@ String[] config;
 spiderweb applet = this;
 int PORT = 5204;
 int SERVER_POLLING_PERIOD = 200;
+int LONELY_SERVER_POLLING_PERIOD = 5;
 int REFRESH_POLLING_PERIOD = 9;
 int CHUNK_SIZE = 1000000; //bytes
 int counter = 0;
@@ -30,6 +31,7 @@ void setup() {
   peers = new ArrayList();
   this.frame.setVisible(false);
   frameRate(1);
+  serverReport = getPeers(config[1], config[2], config[3], getIP());
 }
 
 void draw() {
@@ -38,7 +40,8 @@ void draw() {
 
   //DO SOME SHIT HERE
 
-  if (counter%SERVER_POLLING_PERIOD == 0) {
+  if (counter%SERVER_POLLING_PERIOD == 0 || (serverReport.length == 0 && counter%LONELY_SERVER_POLLING_PERIOD == 0)) {
+    println("polling server...");
     serverReport = getPeers(config[1], config[2], config[3], getIP());
     peers.clear();
     println("peer count: " + serverReport.length);
@@ -172,6 +175,7 @@ public static byte[] serialize(Object obj) {
   }
   return out.toByteArray();
 }
+
 public static Object deserialize(byte[] data) {
   ByteArrayInputStream in = null;
   ObjectInputStream is = null;
