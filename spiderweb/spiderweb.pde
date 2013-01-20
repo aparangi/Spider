@@ -66,14 +66,13 @@ void draw() {
   //get all messages
   Client nextClient = server.available();
   while (nextClient != null) {
-    //println(toHex(nextClient.readBytes())); 
-    //println(nextClient.readString());
-
     FileFolder manifest = (FileFolder)(deserialize(nextClient.readBytes()));
     if (manifest != null) {
       manifest.applet = applet;
       manifest.printFolder();
     }
+    //add client to peer list if client is not already in peer list
+    
     nextClient = server.available();
   }
   counter++;
